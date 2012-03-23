@@ -154,6 +154,16 @@ leave this to the environment variables outside of Emacs.")
       (unless (string-match "\\(^[[:alpha:]]:/$\\|^/[^\/]+:/?$\\|^/$\\)" dir)
         (rinari-root new-dir)))))
 
+(defun rinari-app-root (&optional dir home)
+  (or dir (setq dir default-directory))
+  (if (file-exists-p (expand-file-name
+                      "environment.rb" (expand-file-name "config" dir)))
+      (expand-file-name "app" dir)
+    (let ((new-dir (expand-file-name (file-name-as-directory "..") dir)))
+      ;; regexp to match windows roots, tramp roots, or regular posix roots
+      (unless (string-match "\\(^[[:alpha:]]:/$\\|^/[^\/]+:/?$\\|^/$\\)" dir)
+        (rinari-app-root new-dir)))))
+
 ;;--------------------------------------------------------------------------------
 ;; user functions
 
@@ -247,7 +257,7 @@ argument allows editing of the test command arguments."
                "\\?" "\\\\\\\\?"
                (replace-regexp-in-string " +" "_" (match-string 1 name)))
             (if (string-match "^test" name)
-              name))))))
+                name))))))
 
 
 (defun rinari-console (&optional edit-cmd-args)
@@ -420,7 +430,7 @@ With optional prefix argument just run `rgrep'."
           (setq query (buffer-substring-no-properties (point) (mark)))
         (setq query (thing-at-point 'word)))
       (funcall 'rgrep (read-from-minibuffer "search for: " query)
-               rinari-rgrep-file-endings (rinari-root)))))
+               rinari-rgrep-file-endings (rinari-app-root)))))
 
 (defun rinari-ending ()
   "Returns the ending of the current file (ending being the file extension)."
