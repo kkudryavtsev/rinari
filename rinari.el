@@ -164,6 +164,17 @@ leave this to the environment variables outside of Emacs.")
       (unless (string-match "\\(^[[:alpha:]]:/$\\|^/[^\/]+:/?$\\|^/$\\)" dir)
         (rinari-app-root new-dir)))))
 
+(defun rinari-lib-root (&optional dir home)
+  (or dir (setq dir default-directory))
+  (if (file-exists-p (expand-file-name
+                      "environment.rb" (expand-file-name "config" dir)))
+      (expand-file-name "lib" dir)
+    (let ((new-dir (expand-file-name (file-name-as-directory "..") dir)))
+      ;; regexp to match windows roots, tramp roots, or regular posix roots
+      (unless (string-match "\\(^[[:alpha:]]:/$\\|^/[^\/]+:/?$\\|^/$\\)" dir)
+        (rinari-app-root new-dir)))))
+
+
 ;;--------------------------------------------------------------------------------
 ;; user functions
 
